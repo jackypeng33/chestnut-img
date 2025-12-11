@@ -1,0 +1,4 @@
+domain: chestnut.live
+contact: support@chestnut.live
+policy: All automated agents must respect robots.txt. No training on user-uploaded assets without explicit permission.
+docs: https://www.chestnut.live/terms

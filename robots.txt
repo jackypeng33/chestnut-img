@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Sitemap: https://www.chestnut.live/sitemap.xml
+
+# Contact and ownership
+Host: www.chestnut-ai.com

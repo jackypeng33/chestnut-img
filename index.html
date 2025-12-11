@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chestnut AI - OpenAI Image Generator & Editor</title>
+  <meta name="description" content="Create stunning visuals with Chestnut AI. High-fidelity text rendering, precise editing, and OpenAI-powered generation.">
+  <meta name="keywords" content="Chestnut AI, OpenAI image generator, AI art tool, text to image, AI image editor, Nano Banana alternative, high-fidelity AI">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0e1118;
+      --panel: #111523;
+      --card: #151a2c;
+      --stroke: rgba(255, 255, 255, 0.14);
+      --accent: #7c5dff;
+      --accent-2: #37d5ff;
+      --text: #f5f7fb;
+      --muted: #c3c7d3;
+      --muted-2: #9aa0b1;
+      --radius: 18px;
+      --shadow: 0 26px 80px rgba(0, 0, 0, 0.35);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Inter', 'Space Grotesk', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: radial-gradient(circle at 20% 20%, rgba(124, 93, 255, 0.18), transparent 28%), radial-gradient(circle at 80% 0%, rgba(55, 213, 255, 0.14), transparent 30%), var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    .page {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 20px 88px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0 22px;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 18px;
+      letter-spacing: 0.2px;
+    }
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: grid;
+      place-items: center;
+      color: #0a0c12;
+      font-weight: 800;
+      box-shadow: 0 12px 30px rgba(55, 213, 255, 0.25);
+    }
+    nav {
+      display: flex;
+      gap: 14px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    nav a {
+      padding: 9px 12px;
+      border-radius: 12px;
+      transition: background 0.2s, color 0.2s;
+    }
+    nav a:hover { background: rgba(255, 255, 255, 0.08); color: var(--text); }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--stroke);
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .hero {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 28px;
+      align-items: center;
+      padding: 32px;
+      border-radius: 26px;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.03));
+      border: 1px solid var(--stroke);
+      box-shadow: var(--shadow);
+    }
+    .hero h1 {
+      margin: 12px 0 14px;
+      font-size: clamp(30px, 4vw, 46px);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+    }
+    .hero p {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 16px;
+      max-width: 640px;
+    }
+    .cta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 18px;
+      border-radius: 14px;
+      font-weight: 700;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.2s, background 0.2s, border-color 0.2s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #0a0c12;
+      box-shadow: 0 16px 40px rgba(55, 213, 255, 0.32);
+    }
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      border-color: var(--stroke);
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .hero-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .meta-card {
+      padding: 12px 14px;
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--stroke);
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .panel {
+      position: relative;
+      border-radius: 22px;
+      background: radial-gradient(circle at 20% 20%, rgba(124, 93, 255, 0.28), transparent 40%), radial-gradient(circle at 80% 0%, rgba(55, 213, 255, 0.22), transparent 42%), #0f121e;
+      border: 1px solid var(--stroke);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      padding: 16px;
+      min-height: 280px;
+    }
+    .visual {
+      position: relative;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      height: 100%;
+      padding: 18px;
+      color: var(--text);
+    }
+    .visual-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #7c5dff;
+      box-shadow: 0 0 0 6px rgba(124, 93, 255, 0.16);
+    }
+    .visual-body {
+      display: grid;
+      grid-template-columns: 1.2fr 0.9fr;
+      gap: 14px;
+    }
+    .visual-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 14px;
+      height: 100%;
+    }
+    .line {
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.18);
+      margin-bottom: 8px;
+    }
+    .line.short { width: 50%; }
+    .line.med { width: 70%; }
+    .line.long { width: 90%; }
+    .visual-thumb {
+      background: linear-gradient(145deg, rgba(124, 93, 255, 0.6), rgba(55, 213, 255, 0.45));
+      border-radius: 12px;
+      height: 120px;
+      position: relative;
+      overflow: hidden;
+    }
+    .visual-thumb:after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(15, 17, 24, 0.55) 100%);
+    }
+    .panel-note {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    section { margin: 56px 0; }
+    section h2 {
+      margin: 0 0 12px;
+      font-size: 26px;
+      letter-spacing: -0.01em;
+    }
+    section p.lead {
+      margin: 0 0 18px;
+      color: var(--muted);
+      max-width: 760px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.18);
+    }
+    .card strong { display: block; margin-bottom: 8px; }
+    .card p { margin: 0; color: var(--muted); }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text);
+      font-size: 12px;
+      border: 1px solid var(--stroke);
+    }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .table th, .table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--stroke);
+      text-align: left;
+      color: var(--muted);
+    }
+    .table th { color: var(--text); font-weight: 700; }
+    .steps {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+    .step {
+      padding: 16px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--stroke);
+    }
+    .faq {
+      display: grid;
+      gap: 12px;
+    }
+    .faq details {
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      border-radius: 14px;
+      padding: 12px 14px;
+    }
+    .faq summary {
+      cursor: pointer;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .faq p { margin: 8px 0 0; color: var(--muted); }
+    footer {
+      margin-top: 60px;
+      padding: 18px;
+      border: 1px solid var(--stroke);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.05);
+      text-align: center;
+      color: var(--muted-2);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2);
+    }
+    @media (max-width: 720px) {
+      header { flex-wrap: wrap; gap: 10px; }
+      nav { width: 100%; justify-content: flex-start; flex-wrap: wrap; }
+      .hero { padding: 24px; }
+      .cta { width: 100%; }
+      .btn { justify-content: center; flex: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="brand">
+        <div class="brand-mark">C</div>
+        <span>Chestnut AI</span>
+      </div>
+      <nav>
+        <a href="#features">Features</a>
+        <a href="#use-cases">Use Cases</a>
+        <a href="#how">How It Works</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div>
+        <div class="pill">OpenAI image models - High-fidelity text - Precise editing</div>
+        <h1>Chestnut AI: Next-gen image generation and editing powered by OpenAI.</h1>
+        <p>Turn text into high-fidelity art with accurate text rendering, precise inpainting, and multi-image composition. The best Nano Banana alternative for product teams and creators.</p>
+        <div class="cta">
+          <a class="btn btn-primary" href="#start">Start generating free</a>
+          <a class="btn btn-ghost" href="#how">See how it works</a>
+        </div>
+        <div class="hero-meta">
+          <div class="meta-card">100 free daily credits</div>
+          <div class="meta-card">No credit card required</div>
+          <div class="meta-card">Studio-quality outputs</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="visual" role="presentation" aria-label="Chestnut image editor preview">
+          <div class="visual-header">
+            <div class="dot"></div>
+            <div class="line med"></div>
+            <div class="line short" style="margin-bottom:0;"></div>
+          </div>
+          <div class="visual-body">
+            <div class="visual-card">
+              <div class="line long"></div>
+              <div class="line med"></div>
+              <div class="visual-thumb"></div>
+            </div>
+            <div class="visual-card">
+              <div class="line long"></div>
+              <div class="line med"></div>
+              <div class="line short"></div>
+            </div>
+          </div>
+        </div>
+        <div class="panel-note">Sketch to photorealistic masterpiece in one prompt.</div>
+      </div>
+    </section>
+
+    <section id="features">
+      <h2>Why choose Chestnut</h2>
+      <p class="lead">We combine OpenAI visual reasoning with tools built for precision and control.</p>
+      <div class="grid">
+        <div class="card">
+          <span class="tag">High-fidelity text</span>
+          <strong>Legible logos, covers, and posters</strong>
+          <p>Stop wrestling with gibberish. Chestnut understands language inside images for clean, correct spelling straight from your prompt.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Precision editing</span>
+          <strong>Inpainting to fix details</strong>
+          <p>Change a shirt color, remove a background object, or repair hands without regenerating the entire image.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Multi-image composition</span>
+          <strong>Blend concepts seamlessly</strong>
+          <p>Upload reference photos to guide structure or style, creating hybrids that stay on-brand.</p>
+        </div>
+        <div class="card">
+          <span class="tag">OpenAI powered</span>
+          <strong>Advanced visual reasoning</strong>
+          <p>Understands nuance, idioms, and abstract concepts better than typical free AI art tools.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="use-cases">
+      <h2>Use cases</h2>
+      <p class="lead">Who benefits from Chestnut AI.</p>
+      <table class="table">
+        <thead>
+          <tr><th>User</th><th>Benefit</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Marketers</strong></td><td>Ad creatives and social visuals that match brand styles and drive clicks.</td></tr>
+          <tr><td><strong>Game designers</strong></td><td>Prototype assets, textures, and characters with consistent styling.</td></tr>
+          <tr><td><strong>E-commerce</strong></td><td>Place products in any environment using background replacement tools.</td></tr>
+          <tr><td><strong>Writers</strong></td><td>Visualize scenes and characters to support storytelling and world-building.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="how">
+      <h2>How to generate images</h2>
+      <div class="steps">
+        <div class="step">
+          <strong>Step 1 - Input your vision</strong>
+          <p>Type a detailed prompt. Example: "A cinematic shot of a futuristic chestnut robot painting on a canvas, 8k resolution, studio lighting."</p>
+        </div>
+        <div class="step">
+          <strong>Step 2 - Select your mode</strong>
+          <p>Choose Creative, Realistic, or Design modes to match your project needs.</p>
+        </div>
+        <div class="step">
+          <strong>Step 3 - Generate and refine</strong>
+          <p>Hit generate. Use the Magic Edit brush to tweak specific areas without starting over.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq">
+      <h2>Frequently asked questions</h2>
+      <div class="faq">
+        <details>
+          <summary>Is Chestnut AI free to use?</summary>
+          <p>Yes. You get 100 generation credits every day on the free tier. Pro plans add high-resolution downloads and commercial rights.</p>
+        </details>
+        <details>
+          <summary>How is Chestnut different from Nano Banana?</summary>
+          <p>Chestnut prioritizes user control and text integration, using a fine-tuned OpenAI model that sticks closely to complex prompts.</p>
+        </details>
+        <details>
+          <summary>Can I use the images for commercial purposes?</summary>
+          <p>Images generated under Pro and Enterprise plans include full commercial ownership rights.</p>
+        </details>
+        <details>
+          <summary>Does it support image-to-image generation?</summary>
+          <p>Yes. Upload an image and guide it with a prompt, such as "turn this photo into an oil painting."</p>
+        </details>
+      </div>
+    </section>
+
+    <section id="start">
+      <h2>Ready to create?</h2>
+      <p class="lead">Do not let ideas stay in your head. Experience Chestnut AI precision now.</p>
+      <div class="cta">
+        <a class="btn btn-primary" href="#">Launch app now</a>
+        <a class="btn btn-ghost" href="#features">View features</a>
+      </div>
+    </section>
+
+    <footer>
+      © 2025 Chestnut AI. Powered by OpenAI Technology. All rights reserved. Privacy Policy · Terms of Service · Blog
+    </footer>
+  </div>
+</body>
+</html>
